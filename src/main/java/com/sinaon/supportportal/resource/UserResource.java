@@ -1,6 +1,5 @@
 package com.sinaon.supportportal.resource;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -32,39 +31,45 @@ import com.sinaon.supportportal.utility.JWTTokenProvider;
 public class UserResource extends ExceptionHandling {
 
 	private AuthenticationManager authenticationManager;
-    private UserService userService;
-    private JWTTokenProvider jwtTokenProvider;
+	private UserService userService;
+	private JWTTokenProvider jwtTokenProvider;
 
-    @Autowired
-    public UserResource(AuthenticationManager authenticationManager, UserService userService, JWTTokenProvider jwtTokenProvider) {
-        this.authenticationManager = authenticationManager;
-        this.userService = userService;
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
+	@Autowired
+	public UserResource(AuthenticationManager authenticationManager, UserService userService,
+			JWTTokenProvider jwtTokenProvider) {
+		this.authenticationManager = authenticationManager;
+		this.userService = userService;
+		this.jwtTokenProvider = jwtTokenProvider;
+	}
 
 	@PostMapping("/login")
 	public ResponseEntity<User> login(@RequestBody User user) {
 		authenticate(user.getUsername(), user.getPassword());
+		System.out.println("--> DONE AUTHENTICATION!");
 		User loginUser = userService.findUserByUsername(user.getUsername());
+		System.out.println("--> DONE USERLOGIN!");
 		UserPrincipal userPrincipal = new UserPrincipal(loginUser);
+		System.out.println("--> DONE USERPRINCIPAL!");
 		HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
+		System.out.println("--> DONE HEADERS!");
 		return new ResponseEntity<>(loginUser, jwtHeader, HttpStatus.OK);
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<User> register(@RequestBody User user) throws UserNotFoundException, UsernameExistException, EmailExistException {
-		User newUser = userService.register(user.getFirstname(), user.getLastname(), user.getUsername(), user.getEmail());
+	public ResponseEntity<User> register(@RequestBody User user)
+			throws UserNotFoundException, UsernameExistException, EmailExistException {
+		User newUser = userService.register(user.getFirstname(), user.getLastname(), user.getUsername(),
+				user.getEmail());
 		return new ResponseEntity<>(newUser, HttpStatus.OK);
 	}
-	
+
 	private void authenticate(String username, String password) {
 		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-		
 	}
-	
-	private HttpHeaders getJwtHeader(UserPrincipal userPrincipal) {
+
+	private HttpHeaders getJwtHeader(UserPrincipal user) {
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(SecurityConstant.JWT_TOKEN_HEADER, jwtTokenProvider.generateJwtToken(userPrincipal));
+		headers.add(SecurityConstant.JWT_TOKEN_HEADER, jwtTokenProvider.generateJwtToken(user));
 		return headers;
 	}
 }
