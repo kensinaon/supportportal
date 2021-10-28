@@ -45,13 +45,13 @@ public class UserServiceImp implements UserService, UserDetailsService {
 	private Logger LOGGER = LoggerFactory.getLogger(UserServiceImp.class);
 
 	private UserRepository userRepository;
-    private BCryptPasswordEncoder passwordEncoder;
+	private BCryptPasswordEncoder passwordEncoder;
 
-    @Autowired
-    public UserServiceImp(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+	@Autowired
+	public UserServiceImp(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+		this.userRepository = userRepository;
+		this.passwordEncoder = passwordEncoder;
+	}
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -87,7 +87,8 @@ public class UserServiceImp implements UserService, UserDetailsService {
 	}
 
 	@Override
-	public User register(String firstname, String lastname, String username, String email) throws UserNotFoundException, UsernameExistException, EmailExistException {
+	public User register(String firstname, String lastname, String username, String email)
+			throws UserNotFoundException, UsernameExistException, EmailExistException {
 		validateNewUsernameAndEmail(EMPTY, username, email);
 
 		User user = new User();
